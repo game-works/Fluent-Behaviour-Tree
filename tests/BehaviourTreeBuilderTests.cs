@@ -1,8 +1,5 @@
-﻿using FluentBehaviourTree;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using FluentBehaviourTree;
 using Xunit;
 
 namespace tests
@@ -37,7 +34,7 @@ namespace tests
             Assert.Throws<ApplicationException>(() =>
                 {
                     testObject
-                         .Do("some-node-1", t => BehaviourTreeStatus.Running)
+                         .Do("some-node-1", t => Status.Running)
                          .Build();
                 }
             );
@@ -50,12 +47,12 @@ namespace tests
 
             var node = testObject
                 .Inverter("some-inverter")
-                    .Do("some-node", t =>BehaviourTreeStatus.Success)
+                    .Do("some-node", t =>Status.Success)
                 .End()
                 .Build();
 
-            Assert.IsType<InverterNode>(node);
-            Assert.Equal(BehaviourTreeStatus.Failure, node.Tick(new TimeData()));
+            Assert.IsType<InverterNode<TimeData>>(node);
+            Assert.Equal(Status.Failure, node.Tick(new TimeData()));
         }
 
         [Fact]
@@ -67,7 +64,7 @@ namespace tests
             {
                 testObject
                     .Inverter("some-inverter")
-                    .Do("some-node", t => BehaviourTreeStatus.Success)
+                    .Do("some-node", t => Status.Success)
                 .Build();
             });
         }
@@ -83,8 +80,8 @@ namespace tests
                 .End()
                 .Build();
 
-            Assert.IsType<InverterNode>(node);
-            Assert.Equal(BehaviourTreeStatus.Failure, node.Tick(new TimeData()));
+            Assert.IsType<InverterNode<TimeData>>(node);
+            Assert.Equal(Status.Failure, node.Tick(new TimeData()));
         }
 
         [Fact]
@@ -95,13 +92,13 @@ namespace tests
             var node = testObject
                 .Inverter("some-inverter")
                     .Inverter("some-other-inverter")
-                        .Do("some-node", t => BehaviourTreeStatus.Success)
+                        .Do("some-node", t => Status.Success)
                     .End()
                 .End()
                 .Build();
 
-            Assert.IsType<InverterNode>(node);
-            Assert.Equal(BehaviourTreeStatus.Success, node.Tick(new TimeData()));
+            Assert.IsType<InverterNode<TimeData>>(node); 
+            Assert.Equal(Status.Success, node.Tick(new TimeData()));
         }
 
         [Fact]
@@ -113,8 +110,8 @@ namespace tests
             {
                 testObject
                     .Inverter("some-inverter")
-                        .Do("some-node", t => BehaviourTreeStatus.Success)
-                        .Do("some-other-node", t => BehaviourTreeStatus.Success)
+                        .Do("some-node", t => Status.Success)
+                        .Do("some-other-node", t => Status.Success)
                     .End()
                     .Build();
             });
@@ -132,18 +129,18 @@ namespace tests
                     .Do("some-action-1", t => 
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                     .Do("some-action-2", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                 .End()
                 .Build();
 
-            Assert.IsType<SequenceNode>(sequence);
-            Assert.Equal(BehaviourTreeStatus.Success, sequence.Tick(new TimeData()));
+            Assert.IsType<SequenceNode<TimeData>>(sequence);
+            Assert.Equal(Status.Success, sequence.Tick(new TimeData()));
             Assert.Equal(2, invokeCount);
         }
 
@@ -159,18 +156,18 @@ namespace tests
                     .Do("some-action-1", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                     .Do("some-action-2", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                 .End()
                 .Build();
 
-            Assert.IsType<ParallelNode>(parallel);
-            Assert.Equal(BehaviourTreeStatus.Success, parallel.Tick(new TimeData()));
+            Assert.IsType<ParallelNode<TimeData>>(parallel);
+            Assert.Equal(Status.Success, parallel.Tick(new TimeData()));
             Assert.Equal(2, invokeCount);
         }
 
@@ -186,18 +183,18 @@ namespace tests
                     .Do("some-action-1", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Failure;
+                        return Status.Failure;
                     })
                     .Do("some-action-2", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                 .End()
                 .Build();
 
-            Assert.IsType<SelectorNode>(parallel);
-            Assert.Equal(BehaviourTreeStatus.Success, parallel.Tick(new TimeData()));
+            Assert.IsType<SelectorNode<TimeData>>(parallel);
+            Assert.Equal(Status.Success, parallel.Tick(new TimeData()));
             Assert.Equal(2, invokeCount);
         }
 
@@ -213,7 +210,7 @@ namespace tests
                     .Do("test", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                 .End()
                 .Build();
@@ -241,7 +238,7 @@ namespace tests
                     .Do("test", t =>
                     {
                         ++invokeCount;
-                        return BehaviourTreeStatus.Success;
+                        return Status.Success;
                     })
                 .End()
                 .Build();

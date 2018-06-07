@@ -5,39 +5,32 @@ namespace FluentBehaviourTree
     /// <summary>
     /// Interface for behaviour tree nodes.
     /// </summary>
-    public abstract class ParentBehaviourTreeNode : BehaviourTreeNode
+    public abstract class ParentBehaviourTreeNode<T> : BehaviourTreeNode<T> where T : ITickData
     {
         /// <summary>
         /// List of child nodes
         /// </summary>
-        private List<BehaviourTreeNode> children = new List<BehaviourTreeNode>();
+        private readonly List<BehaviourTreeNode<T>> _children = new List<BehaviourTreeNode<T>>();
 
         /// <summary>
         /// The number of children added to this node
         /// </summary>
-        public int childCount {
-            get {
-                return children.Count;
-            }
-        }
+        public int ChildCount => _children.Count;
 
-        public ParentBehaviourTreeNode(string name) : base(name) { }
+        protected ParentBehaviourTreeNode(string name) : base(name) { }
 
         /// <summary>
         /// Retrieve a child node by index.
         /// </summary>
-        public BehaviourTreeNode this[int index] {
-            get {
-                return children[index];
-            }
-        }
+        public BehaviourTreeNode<T> this[int index] => _children[index];
+
         /// <summary>
         /// Marks that this node and all children have not execute yet.
         /// </summary>
         internal override void ResetLastExecStatus()
         {
             base.ResetLastExecStatus();
-            for (int i = 0; i < childCount; i++)
+            for (int i = 0; i < ChildCount; i++)
             {
                 this[i].ResetLastExecStatus();
             }
@@ -45,9 +38,9 @@ namespace FluentBehaviourTree
         /// <summary>
         /// Add a child to the parent node.
         /// </summary>
-        public virtual void AddChild(BehaviourTreeNode child)
+        public virtual void AddChild(BehaviourTreeNode<T> child)
         {
-            children.Add(child);
+            _children.Add(child);
         }
     }
 }

@@ -3,44 +3,52 @@
     /// <summary>
     /// Interface for behaviour tree nodes.
     /// </summary>
-    public abstract class BehaviourTreeNode
+    public abstract class BehaviourTreeNode<T> where T : ITickData
     {
         /// <summary>
         /// The reference name for this node
         /// </summary>
-        public string name { get; private set; }
+        public string Name { get; }
         /// <summary>
         /// The result of the last execution
         /// </summary>
-        public BehaviourTreeStatus lastExecutionStatus { get; private set; }
+        public Status LastExecutionStatus { get; private set; }
         /// <summary>
         /// Used to determine if this node has been ticked yet this iteration.
         /// </summary>
-        public bool hasExecuted { get; private set; }
+        public bool HasExecuted { get; private set; }
 
-        public BehaviourTreeNode(string name)
+        protected BehaviourTreeNode(string name)
         {
-            this.name = name;
-            lastExecutionStatus = BehaviourTreeStatus.Failure;
+            Name = name;
+            LastExecutionStatus = Status.Failure;
+        }
+
+        protected BehaviourTreeNode()
+        {
+            Name = "BehaviourTreeNode";
+            LastExecutionStatus = Status.Failure;
         }
 
         /// <summary>
         /// Update the time of the behaviour tree.
         /// </summary>
-        public BehaviourTreeStatus Tick(TimeData time)
+        public virtual Status Tick(T time)
         {
             ResetLastExecStatus();
-            lastExecutionStatus = AbstractTick(time);
-            hasExecuted = true;
-            return lastExecutionStatus;
+            LastExecutionStatus = AbstractTick(time);
+            HasExecuted = true;
+            return LastExecutionStatus;
         }
         /// <summary>
         /// Marks that this node hasn't executed yet.
         /// </summary>
         internal virtual void ResetLastExecStatus()
         {
-            hasExecuted = false;
+            HasExecuted = false;
         }
-        protected abstract BehaviourTreeStatus AbstractTick(TimeData time);
+        protected abstract Status AbstractTick(T data);
     }
+
+    public abstract class BehaviourTreeNode : BehaviourTreeNode<TimeData> { }
 }

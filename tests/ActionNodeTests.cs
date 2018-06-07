@@ -1,8 +1,4 @@
 ﻿using FluentBehaviourTree;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace tests
@@ -23,11 +19,11 @@ namespace tests
                         Assert.Equal(time, t);
 
                         ++invokeCount;
-                        return BehaviourTreeStatus.Running;
+                        return Status.Running;
                     }
                 );
 
-            Assert.Equal(BehaviourTreeStatus.Running, testObject.Tick(time));
+            Assert.Equal(Status.Running, testObject.Tick(time));
             Assert.Equal(1, invokeCount);            
         }
     }

@@ -1,9 +1,6 @@
-﻿using FluentBehaviourTree;
+﻿using System;
+using FluentBehaviourTree;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace tests
@@ -37,11 +34,11 @@ namespace tests
             var mockChildNode = new Mock<BehaviourTreeNode>();
             mockChildNode
                 .Setup(m => m.Tick(time))
-                .Returns(BehaviourTreeStatus.Success);
+                .Returns(Status.Success);
 
             testObject.AddChild(mockChildNode.Object);
 
-            Assert.Equal(BehaviourTreeStatus.Failure, testObject.Tick(time));
+            Assert.Equal(Status.Failure, testObject.Tick(time));
 
             mockChildNode.Verify(m => m.Tick(time), Times.Once());
         }
@@ -56,11 +53,11 @@ namespace tests
             var mockChildNode = new Mock<BehaviourTreeNode>();
             mockChildNode
                 .Setup(m => m.Tick(time))
-                .Returns(BehaviourTreeStatus.Failure);
+                .Returns(Status.Failure);
 
             testObject.AddChild(mockChildNode.Object);
 
-            Assert.Equal(BehaviourTreeStatus.Success, testObject.Tick(time));
+            Assert.Equal(Status.Success, testObject.Tick(time));
 
             mockChildNode.Verify(m => m.Tick(time), Times.Once());
         }
@@ -75,11 +72,11 @@ namespace tests
             var mockChildNode = new Mock<BehaviourTreeNode>();
             mockChildNode
                 .Setup(m => m.Tick(time))
-                .Returns(BehaviourTreeStatus.Running);
+                .Returns(Status.Running);
 
             testObject.AddChild(mockChildNode.Object);
 
-            Assert.Equal(BehaviourTreeStatus.Running, testObject.Tick(time));
+            Assert.Equal(Status.Running, testObject.Tick(time));
 
             mockChildNode.Verify(m => m.Tick(time), Times.Once());
         }

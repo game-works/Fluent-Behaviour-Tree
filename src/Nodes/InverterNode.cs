@@ -5,52 +5,44 @@ namespace FluentBehaviourTree
     /// <summary>
     /// Decorator node that inverts the success/failure of its child.
     /// </summary>
-    public class InverterNode : ParentBehaviourTreeNode
+    public class InverterNode<T> : ParentBehaviourTreeNode<T> where T : ITickData
     {
         /// <summary>
         /// The child to be inverted.
         /// </summary>
-        private BehaviourTreeNode childNode {
-            get {
-                if (childCount == 0)
-                {
-                    return null;
-                }
-                return this[0];
-            }
-        }
+        private BehaviourTreeNode<T> ChildNode => ChildCount == 0 ? null : this[0];
 
         public InverterNode(string name) : base(name) { }
 
-        protected override BehaviourTreeStatus AbstractTick(TimeData time)
+        protected override Status AbstractTick(T data)
         {
-            if (childNode == null)
-            {
+            if (ChildNode == null)
                 throw new ApplicationException("InverterNode must have a child node!");
-            }
 
-            var result = childNode.Tick(time);
-            if (result == BehaviourTreeStatus.Failure)
+            var result = ChildNode.Tick(data);
+
+            switch (result)
             {
-                return BehaviourTreeStatus.Success;
-            }
-            else if (result == BehaviourTreeStatus.Success)
-            {
-                return BehaviourTreeStatus.Failure;
-            }
-            else
-            {
-                return result;
+                case Status.Failure:
+                    return Status.Success;
+                case Status.Success:
+                    return Status.Failure;
+                default:
+                    return result;
             }
         }
 
-        public override void AddChild(BehaviourTreeNode child)
+        public override void AddChild(BehaviourTreeNode<T> child)
         {
-            if (childNode != null)
-            {
+            if (ChildNode != null)
                 throw new ApplicationException("Can't add more than a single child to InverterNode!");
-            }
+            
             base.AddChild(child);
         }
+    }
+
+    public class InverterNode : InverterNode<TimeData>
+    {
+        public InverterNode(string name) : base(name) { }
     }
 }

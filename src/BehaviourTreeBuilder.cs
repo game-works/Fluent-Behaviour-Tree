@@ -6,24 +6,24 @@ namespace FluentBehaviourTree
     /// <summary>
     /// Fluent API for building a behaviour tree.
     /// </summary>
-    public class BehaviourTreeBuilder
+    public class BehaviourTreeBuilder<T> where T : ITickData
     {
         /// <summary>
         /// Last node created.
         /// </summary>
-        private BehaviourTreeNode curNode = null;
+        private BehaviourTreeNode<T> _curNode;
 
         /// <summary>
         /// Stack node nodes that we are build via the fluent API.
         /// </summary>
-        private Stack<ParentBehaviourTreeNode> parentNodeStack = new Stack<ParentBehaviourTreeNode>();
+        private readonly Stack<ParentBehaviourTreeNode<T>> _parentNodeStack = new Stack<ParentBehaviourTreeNode<T>>();
 
         /// <summary>
         /// Create an action node.
         /// </summary>
-        public BehaviourTreeBuilder Do(string name, Func<TimeData, BehaviourTreeStatus> fn)
+        public BehaviourTreeBuilder<T> Do(string name, Func<T, Status> fn)
         {
-            if (parentNodeStack.Count <= 0)
+            if (_parentNodeStack.Count <= 0)
             {
                 throw new ApplicationException("Can't create an unnested ActionNode, it must be a leaf node.");
             }
@@ -31,124 +31,127 @@ namespace FluentBehaviourTree
             {
                 name = fn.Method.Name;
             }
-            var actionNode = new ActionNode(name, fn);
-            parentNodeStack.Peek().AddChild(actionNode);
+            var actionNode = new ActionNode<T>(name, fn);
+            _parentNodeStack.Peek().AddChild(actionNode);
             return this;
         }
 
         /// <summary>
         /// Like an action node... but the function can return true/false and is mapped to success/failure.
         /// </summary>
-        public BehaviourTreeBuilder Condition(string name, Func<TimeData, bool> fn)
+        public BehaviourTreeBuilder<T> Condition(string name, Func<T, bool> fn)
         {
             if (string.IsNullOrEmpty(name))
             {
                 name = fn.Method.Name;
             }
-            return Do(name, t => fn(t) ? BehaviourTreeStatus.Success : BehaviourTreeStatus.Failure);
+            return Do(name, t => fn(t) ? Status.Success : Status.Failure);
         }
 
         /// <summary>
         /// Create an inverter node that inverts the success/failure of its children.
         /// </summary>
-        public BehaviourTreeBuilder Inverter(string name)
+        public BehaviourTreeBuilder<T> Inverter(string name)
         {
-            var inverterNode = new InverterNode(name);
+            var inverterNode = new InverterNode<T>(name);
 
-            if (parentNodeStack.Count > 0)
+            if (_parentNodeStack.Count > 0)
             {
-                parentNodeStack.Peek().AddChild(inverterNode);
+                _parentNodeStack.Peek().AddChild(inverterNode);
             }
 
-            parentNodeStack.Push(inverterNode);
+            _parentNodeStack.Push(inverterNode);
             return this;
         }
 
         /// <summary>
         /// Create a sequence node.
         /// </summary>
-        public BehaviourTreeBuilder Sequence(string name)
+        public BehaviourTreeBuilder<T> Sequence(string name)
         {
-            var sequenceNode = new SequenceNode(name);
+            var sequenceNode = new SequenceNode<T>(name);
 
-            if (parentNodeStack.Count > 0)
+            if (_parentNodeStack.Count > 0)
             {
-                parentNodeStack.Peek().AddChild(sequenceNode);
+                _parentNodeStack.Peek().AddChild(sequenceNode);
             }
 
-            parentNodeStack.Push(sequenceNode);
+            _parentNodeStack.Push(sequenceNode);
             return this;
         }
 
         /// <summary>
         /// Create a parallel node.
         /// </summary>
-        public BehaviourTreeBuilder Parallel(string name, int numRequiredToFail, int numRequiredToSucceed)
+        public BehaviourTreeBuilder<T> Parallel(string name, int numRequiredToFail, int numRequiredToSucceed)
         {
-            var parallelNode = new ParallelNode(name, numRequiredToFail, numRequiredToSucceed);
+            var parallelNode = new ParallelNode<T>(name, numRequiredToFail, numRequiredToSucceed);
 
-            if (parentNodeStack.Count > 0)
+            if (_parentNodeStack.Count > 0)
             {
-                parentNodeStack.Peek().AddChild(parallelNode);
+                _parentNodeStack.Peek().AddChild(parallelNode);
             }
 
-            parentNodeStack.Push(parallelNode);
+            _parentNodeStack.Push(parallelNode);
             return this;
         }
 
         /// <summary>
         /// Create a selector node.
         /// </summary>
-        public BehaviourTreeBuilder Selector(string name)
+        public BehaviourTreeBuilder<T> Selector(string name)
         {
-            var selectorNode = new SelectorNode(name);
+            var selectorNode = new SelectorNode<T>(name);
 
-            if (parentNodeStack.Count > 0)
+            if (_parentNodeStack.Count > 0)
             {
-                parentNodeStack.Peek().AddChild(selectorNode);
+                _parentNodeStack.Peek().AddChild(selectorNode);
             }
 
-            parentNodeStack.Push(selectorNode);
+            _parentNodeStack.Push(selectorNode);
             return this;
         }
 
         /// <summary>
         /// Splice a sub tree into the parent tree.
         /// </summary>
-        public BehaviourTreeBuilder Splice(BehaviourTreeNode subTree)
+        public BehaviourTreeBuilder<T> Splice(BehaviourTreeNode<T> subTree)
         {
             if (subTree == null)
             {
                 throw new ArgumentNullException("subTree");
             }
-            if (parentNodeStack.Count <= 0)
+            if (_parentNodeStack.Count <= 0)
             {
                 throw new ApplicationException("Can't splice an unnested sub-tree, there must be a parent-tree.");
             }
 
-            parentNodeStack.Peek().AddChild(subTree);
+            _parentNodeStack.Peek().AddChild(subTree);
             return this;
         }
 
         /// <summary>
         /// Build the actual tree.
         /// </summary>
-        public BehaviourTreeNode Build()
+        public BehaviourTreeNode<T> Build()
         {
-            if (curNode == null)
-            {
+            if (_curNode == null)
                 throw new ApplicationException("Can't create a behaviour tree with zero nodes");
-            }
-            return curNode;
+            
+            return _curNode;
         }
 
         /// <summary>
         /// Ends a sequence of children.
         /// </summary>
-        public BehaviourTreeBuilder End()
+        public BehaviourTreeBuilder<T> End()
         {
-            curNode = parentNodeStack.Pop();
+            _curNode = _parentNodeStack.Pop();
             return this;
         }
+    }
+
+    public class BehaviourTreeBuilder : BehaviourTreeBuilder<TimeData>
+    {
     }
 }
