@@ -8,6 +8,9 @@ namespace FluentBehaviourTree
     /// </summary>
     public class BehaviourTreeBuilder<T> where T : ITickData
     {
+        private int _sequenceOccurenceCounter;
+        private int _selectorOccurenceCounter;
+
         /// <summary>
         /// Last node created.
         /// </summary>
@@ -69,7 +72,8 @@ namespace FluentBehaviourTree
         /// </summary>
         public BehaviourTreeBuilder<T> Sequence(string name)
         {
-            var sequenceNode = new SequenceNode<T>(name);
+            var sequenceNode = new SequenceNode<T>(name) { SequenceId = _sequenceOccurenceCounter };
+            _sequenceOccurenceCounter++;
 
             if (_parentNodeStack.Count > 0)
             {
@@ -101,7 +105,8 @@ namespace FluentBehaviourTree
         /// </summary>
         public BehaviourTreeBuilder<T> Selector(string name)
         {
-            var selectorNode = new SelectorNode<T>(name);
+            var selectorNode = new SelectorNode<T>(name) { SelectorId = _selectorOccurenceCounter };
+            _selectorOccurenceCounter++;
 
             if (_parentNodeStack.Count > 0)
             {
@@ -137,7 +142,10 @@ namespace FluentBehaviourTree
         {
             if (_curNode == null)
                 throw new ApplicationException("Can't create a behaviour tree with zero nodes");
-            
+
+            _selectorOccurenceCounter = 0;
+            _sequenceOccurenceCounter = 0;
+
             return _curNode;
         }
 

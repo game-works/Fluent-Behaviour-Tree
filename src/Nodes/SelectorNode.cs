@@ -5,18 +5,19 @@
     /// </summary>
     public class SelectorNode<T> : ParentBehaviourTreeNode<T> where T : ITickData
     {
-        private int _runningNodeIndex = -1;
+        public int SelectorId { get; set; }
 
         public SelectorNode(string name) : base(name) { }
 
         protected override Status AbstractTick(T data)
         {
             int index = 0;
-            
-            if (_runningNodeIndex != -1)
+
+            int runningNodeIndex = data.RunningSelectors[SelectorId];
+            if (runningNodeIndex != -1)
             {
-                index = _runningNodeIndex;
-                _runningNodeIndex = -1;
+                index = runningNodeIndex;
+                data.RunningSelectors[SelectorId] = -1;
             }
 
             for (; index < ChildCount; index++)
@@ -29,7 +30,7 @@
 
                 if (childStatus == Status.Running)
                 {
-                    _runningNodeIndex = index;
+                    data.RunningSelectors[SelectorId] = index;
                     return Status.Running;
                 }
             }
