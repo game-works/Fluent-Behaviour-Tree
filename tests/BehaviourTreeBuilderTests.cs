@@ -257,11 +257,11 @@ namespace tests
             TimeData data = new TimeData(0);
             var invokeCount = 0;
 
-            var builder = new BehaviourTreeBuilder<TimeData>(new List<string>
+            var builder = new BehaviourTreeBuilder<TimeData>(new List<int>
             {
-                "seq1",
-                "sel1",
-                "para1"
+                0,
+                2,
+                4
             });
 
             builder
@@ -269,7 +269,7 @@ namespace tests
                 .Do("do1", t =>
                 {
                     ++invokeCount;
-                    return Status.Success;
+                    throw new Exception("do1 invoked.");
                 })
                 .End()
                 .Build()
@@ -280,7 +280,7 @@ namespace tests
                 .Do("do2", t =>
                 {
                     ++invokeCount;
-                    return Status.Success;
+                    throw new Exception("do2 invoked.");
                 })
                 .End()
                 .Build()
@@ -291,13 +291,11 @@ namespace tests
                 .Do("do3", t =>
                 {
                     ++invokeCount;
-                    return Status.Success;
+                    throw new Exception("do3 invoked.");
                 })
                 .End()
                 .Build()
                 .Tick(data);
-
-            Assert.Equal(0, invokeCount);
         }
 
         [Fact]
@@ -306,10 +304,10 @@ namespace tests
             TimeData data = new TimeData(0);
             var invokeCount = 0;
 
-            var builder = new BehaviourTreeBuilder<TimeData>(new List<string>
+            var builder = new BehaviourTreeBuilder<TimeData>(new List<int>
             {
-                "do1",
-                "do2",
+                1,
+                3
             });
 
             builder
@@ -317,7 +315,7 @@ namespace tests
                 .Do("do1", t =>
                 {
                     ++invokeCount;
-                    return Status.Success;
+                    throw new Exception("do1 invoked.");
                 })
                 .End()
                 .Build()
@@ -328,7 +326,7 @@ namespace tests
                 .Do("do2", t =>
                 {
                     ++invokeCount;
-                    return Status.Success;
+                    throw new Exception("do2 invoked.");
                 })
                 .End()
                 .Build()
@@ -344,8 +342,6 @@ namespace tests
                 .End()
                 .Build()
                 .Tick(data);
-
-            Assert.Equal(1, invokeCount);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace tests
 
         void Init()
         {
-            testObject = new InverterNode("some-node");
+            testObject = new InverterNode("some-node", 0);
         }
 
         [Fact]

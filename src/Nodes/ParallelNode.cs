@@ -15,7 +15,7 @@
         /// </summary>
         private readonly int _numRequiredToSucceed;
 
-        public ParallelNode(string name, int numRequiredToFail, int numRequiredToSucceed) : base(name)
+        public ParallelNode(string name, int id, int numRequiredToFail, int numRequiredToSucceed) : base(name, id)
         {
             _numRequiredToFail = numRequiredToFail;
             _numRequiredToSucceed = numRequiredToSucceed;
@@ -53,6 +53,6 @@
 
     public class ParallelNode : ParallelNode<TimeData>
     {
-        public ParallelNode(string name, int numRequiredToFail, int numRequiredToSucceed) : base(name, numRequiredToFail, numRequiredToSucceed) { }
+        public ParallelNode(string name, int id, int numRequiredToFail, int numRequiredToSucceed) : base(name, id, numRequiredToFail, numRequiredToSucceed) { }
     }
 }

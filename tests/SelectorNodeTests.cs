@@ -10,7 +10,7 @@ namespace tests
 
         void Init()
         {
-            testObject = new SelectorNode("some-selector");
+            testObject = new SelectorNode("some-selector", 0);
         }
 
         [Fact]

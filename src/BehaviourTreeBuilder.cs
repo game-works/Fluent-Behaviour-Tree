@@ -8,7 +8,8 @@ namespace FluentBehaviourTree
     /// </summary>
     public class BehaviourTreeBuilder<T> where T : ITickData
     {
-        private readonly List<string> _blacklist = new List<string>();
+        private readonly List<int> _blacklist = new List<int>();
+        private int _idCounter = -1;
         private int _sequenceOccurenceCounter;
         private int _selectorOccurenceCounter;
 
@@ -22,13 +23,13 @@ namespace FluentBehaviourTree
         /// </summary>
         private readonly Stack<ParentBehaviourTreeNode<T>> _parentNodeStack = new Stack<ParentBehaviourTreeNode<T>>();
 
-        public bool IsBlacklisted(string name) => _blacklist?.Contains(name) ?? false;
+        public bool IsBlacklisted(int id) => _blacklist?.Contains(id) ?? false;
 
         public BehaviourTreeBuilder()
         {
         }
 
-        public BehaviourTreeBuilder(List<string> blacklistedNodes)
+        public BehaviourTreeBuilder(List<int> blacklistedNodes)
         {
             _blacklist = blacklistedNodes;
         }
@@ -47,9 +48,10 @@ namespace FluentBehaviourTree
                 name = fn.Method.Name;
             }
 
-            var actionNode = new ActionNode<T>(name, fn)
+            int id = ++_idCounter;
+            var actionNode = new ActionNode<T>(name, id, fn)
             {
-                IsDisabled = IsBlacklisted(name)
+                IsDisabled = IsBlacklisted(id)
             };
 
             _parentNodeStack.Peek().AddChild(actionNode);
@@ -75,7 +77,7 @@ namespace FluentBehaviourTree
         /// </summary>
         public BehaviourTreeBuilder<T> Inverter(string name)
         {
-            var inverterNode = new InverterNode<T>(name);
+            var inverterNode = new InverterNode<T>(name, ++_idCounter);
 
             if (_parentNodeStack.Count > 0)
             {
@@ -91,10 +93,11 @@ namespace FluentBehaviourTree
         /// </summary>
         public BehaviourTreeBuilder<T> Sequence(string name)
         {
-            var sequenceNode = new SequenceNode<T>(name)
+            int id = ++_idCounter;
+            var sequenceNode = new SequenceNode<T>(name, id)
             {
                 SequenceId = _sequenceOccurenceCounter,
-                IsDisabled = IsBlacklisted(name)
+                IsDisabled = IsBlacklisted(id)
             };
 
             _sequenceOccurenceCounter++;
@@ -113,9 +116,10 @@ namespace FluentBehaviourTree
         /// </summary>
         public BehaviourTreeBuilder<T> Parallel(string name, int numRequiredToFail, int numRequiredToSucceed)
         {
-            var parallelNode = new ParallelNode<T>(name, numRequiredToFail, numRequiredToSucceed)
+            int id = ++_idCounter;
+            var parallelNode = new ParallelNode<T>(name, id, numRequiredToFail, numRequiredToSucceed)
             {
-                IsDisabled = IsBlacklisted(name)
+                IsDisabled = IsBlacklisted(id)
             };
 
             if (_parentNodeStack.Count > 0)
@@ -132,10 +136,11 @@ namespace FluentBehaviourTree
         /// </summary>
         public BehaviourTreeBuilder<T> Selector(string name)
         {
-            var selectorNode = new SelectorNode<T>(name)
+            int id = ++_idCounter;
+            var selectorNode = new SelectorNode<T>(name, id)
             {
                 SelectorId = _selectorOccurenceCounter,
-                IsDisabled = IsBlacklisted(name)
+                IsDisabled = IsBlacklisted(id)
             };
 
             _selectorOccurenceCounter++;

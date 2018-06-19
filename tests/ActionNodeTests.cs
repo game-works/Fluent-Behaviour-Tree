@@ -13,7 +13,7 @@ namespace tests
             var invokeCount = 0;
             var testObject = 
                 new ActionNode(
-                    "some-action", 
+                    "some-action", 0,
                     t =>
                     {
                         Assert.Equal(time, t);

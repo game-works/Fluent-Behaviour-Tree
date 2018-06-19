@@ -7,7 +7,7 @@
     {
         public int SequenceId { get; set; }
 
-        public SequenceNode(string name) : base(name) { }
+        public SequenceNode(string name, int id) : base(name, id) { }
 
         protected override Status AbstractTick(T data)
         {
@@ -41,6 +41,6 @@
 
     public class SequenceNode : SequenceNode<TimeData>
     {
-        public SequenceNode(string name) : base(name) { }
+        public SequenceNode(string name, int id) : base(name, id) { }
     }
 }

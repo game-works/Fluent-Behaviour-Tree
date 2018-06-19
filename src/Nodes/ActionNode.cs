@@ -12,7 +12,7 @@ namespace FluentBehaviourTree
         /// </summary>
         private readonly Func<T, Status> _fn;
 
-        public ActionNode(string name, Func<T, Status> fn) : base(name)
+        public ActionNode(string name, int id, Func<T, Status> fn) : base(name, id)
         {
             _fn = fn;
         }
@@ -25,6 +25,6 @@ namespace FluentBehaviourTree
 
     public class ActionNode : ActionNode<TimeData>
     {
-        public ActionNode(string name, Func<TimeData, Status> fn) : base(name, fn) { }
+        public ActionNode(string name, int id, Func<TimeData, Status> fn) : base(name, id, fn) { }
     }
 }

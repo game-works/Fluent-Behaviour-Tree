@@ -12,7 +12,7 @@ namespace FluentBehaviourTree
         /// </summary>
         private BehaviourTreeNode<T> ChildNode => ChildCount == 0 ? null : this[0];
 
-        public InverterNode(string name) : base(name) { }
+        public InverterNode(string name, int id) : base(name, id) { }
 
         protected override Status AbstractTick(T data)
         {
@@ -43,6 +43,6 @@ namespace FluentBehaviourTree
 
     public class InverterNode : InverterNode<TimeData>
     {
-        public InverterNode(string name) : base(name) { }
+        public InverterNode(string name, int id) : base(name, id) { }
     }
 }

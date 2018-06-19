@@ -7,7 +7,7 @@
     {
         public int SelectorId { get; set; }
 
-        public SelectorNode(string name) : base(name) { }
+        public SelectorNode(string name, int id) : base(name, id) { }
 
         protected override Status AbstractTick(T data)
         {
@@ -41,6 +41,6 @@
 
     public class SelectorNode : SelectorNode<TimeData>
     {
-        public SelectorNode(string name) : base(name) { }
+        public SelectorNode(string name, int id) : base(name, id) { }
     }
 }

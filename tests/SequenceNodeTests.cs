@@ -10,7 +10,7 @@ namespace tests
 
         void Init()
         {
-            testObject = new SequenceNode("some-sequence");
+            testObject = new SequenceNode("some-sequence", 0);
         }
         
         [Fact]

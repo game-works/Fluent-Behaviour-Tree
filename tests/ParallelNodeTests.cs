@@ -10,7 +10,7 @@ namespace tests
 
         void Init(int numRequiredToFail = 0, int numRequiredToSucceed = 0)
         {
-            testObject = new ParallelNode("some-parallel", numRequiredToFail, numRequiredToSucceed);
+            testObject = new ParallelNode("some-parallel", 0, numRequiredToFail, numRequiredToSucceed);
         }
 
         [Fact]
