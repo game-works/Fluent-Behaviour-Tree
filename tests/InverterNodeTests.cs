@@ -20,7 +20,7 @@ namespace tests
             Init();
 
             Assert.Throws<ApplicationException>(
-                () => testObject.Tick(new TimeData())
+                () => testObject.Tick(new TimeData(0))
             );
         }
 
@@ -29,7 +29,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChildNode = new Mock<BehaviourTreeNode>();
             mockChildNode
@@ -48,7 +48,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChildNode = new Mock<BehaviourTreeNode>();
             mockChildNode
@@ -67,7 +67,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChildNode = new Mock<BehaviourTreeNode>();
             mockChildNode

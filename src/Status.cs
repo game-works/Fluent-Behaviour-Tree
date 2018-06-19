@@ -7,6 +7,7 @@
     {
         Success,
         Failure,
-        Running
+        Running,
+        Invalid
     }
 }

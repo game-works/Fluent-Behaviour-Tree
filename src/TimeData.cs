@@ -12,8 +12,7 @@
             RunningSelectors = new int[10];
         }
 
-        public float DeltaTime;
-
+        public float DeltaTime { get; set; }
         public int[] RunningSequences { get; set; }
         public int[] RunningSelectors { get; set; }
     }

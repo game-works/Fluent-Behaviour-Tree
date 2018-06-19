@@ -5,14 +5,18 @@
     /// </summary>
     public abstract class BehaviourTreeNode<T> where T : ITickData
     {
+        public bool IsDisabled { get; set; }
+
         /// <summary>
         /// The reference name for this node
         /// </summary>
         public string Name { get; }
+
         /// <summary>
         /// The result of the last execution
         /// </summary>
         public Status LastExecutionStatus { get; private set; }
+
         /// <summary>
         /// Used to determine if this node has been ticked yet this iteration.
         /// </summary>
@@ -35,11 +39,15 @@
         /// </summary>
         public virtual Status Tick(T time)
         {
+            if (IsDisabled)
+                return Status.Invalid;
+
             ResetLastExecStatus();
             LastExecutionStatus = AbstractTick(time);
             HasExecuted = true;
             return LastExecutionStatus;
         }
+        
         /// <summary>
         /// Marks that this node hasn't executed yet.
         /// </summary>
@@ -47,6 +55,7 @@
         {
             HasExecuted = false;
         }
+
         protected abstract Status AbstractTick(T data);
     }
 

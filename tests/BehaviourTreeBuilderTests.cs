@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FluentBehaviourTree;
 using Xunit;
 
@@ -52,7 +53,7 @@ namespace tests
                 .Build();
 
             Assert.IsType<InverterNode<TimeData>>(node);
-            Assert.Equal(Status.Failure, node.Tick(new TimeData()));
+            Assert.Equal(Status.Failure, node.Tick(new TimeData(0)));
         }
 
         [Fact]
@@ -81,7 +82,7 @@ namespace tests
                 .Build();
 
             Assert.IsType<InverterNode<TimeData>>(node);
-            Assert.Equal(Status.Failure, node.Tick(new TimeData()));
+            Assert.Equal(Status.Failure, node.Tick(new TimeData(0)));
         }
 
         [Fact]
@@ -98,7 +99,7 @@ namespace tests
                 .Build();
 
             Assert.IsType<InverterNode<TimeData>>(node); 
-            Assert.Equal(Status.Success, node.Tick(new TimeData()));
+            Assert.Equal(Status.Success, node.Tick(new TimeData(0)));
         }
 
         [Fact]
@@ -140,7 +141,7 @@ namespace tests
                 .Build();
 
             Assert.IsType<SequenceNode<TimeData>>(sequence);
-            Assert.Equal(Status.Success, sequence.Tick(new TimeData()));
+            Assert.Equal(Status.Success, sequence.Tick(new TimeData(0)));
             Assert.Equal(2, invokeCount);
         }
 
@@ -167,7 +168,7 @@ namespace tests
                 .Build();
 
             Assert.IsType<ParallelNode<TimeData>>(parallel);
-            Assert.Equal(Status.Success, parallel.Tick(new TimeData()));
+            Assert.Equal(Status.Success, parallel.Tick(new TimeData(0)));
             Assert.Equal(2, invokeCount);
         }
 
@@ -194,7 +195,7 @@ namespace tests
                 .Build();
 
             Assert.IsType<SelectorNode<TimeData>>(parallel);
-            Assert.Equal(Status.Success, parallel.Tick(new TimeData()));
+            Assert.Equal(Status.Success, parallel.Tick(new TimeData(0)));
             Assert.Equal(2, invokeCount);
         }
 
@@ -221,7 +222,7 @@ namespace tests
                 .End()
                 .Build();
 
-            tree.Tick(new TimeData());
+            tree.Tick(new TimeData(0));
 
             Assert.Equal(1, invokeCount);
         }
@@ -248,6 +249,103 @@ namespace tests
                 testObject
                     .Splice(spliced);
             });
+        }
+
+        [Fact]
+        public void disabled_parent_nodes_is_ignored()
+        {
+            TimeData data = new TimeData(0);
+            var invokeCount = 0;
+
+            var builder = new BehaviourTreeBuilder<TimeData>(new List<string>
+            {
+                "seq1",
+                "sel1",
+                "para1"
+            });
+
+            builder
+                .Sequence("seq1")
+                .Do("do1", t =>
+                {
+                    ++invokeCount;
+                    return Status.Success;
+                })
+                .End()
+                .Build()
+                .Tick(data);
+
+            builder
+                .Selector("sel1")
+                .Do("do2", t =>
+                {
+                    ++invokeCount;
+                    return Status.Success;
+                })
+                .End()
+                .Build()
+                .Tick(data);
+
+            builder
+                .Parallel("para1", 0, 0)
+                .Do("do3", t =>
+                {
+                    ++invokeCount;
+                    return Status.Success;
+                })
+                .End()
+                .Build()
+                .Tick(data);
+
+            Assert.Equal(0, invokeCount);
+        }
+
+        [Fact]
+        public void disabled_leaf_nodes_is_ignored()
+        {
+            TimeData data = new TimeData(0);
+            var invokeCount = 0;
+
+            var builder = new BehaviourTreeBuilder<TimeData>(new List<string>
+            {
+                "do1",
+                "do2",
+            });
+
+            builder
+                .Sequence("seq1")
+                .Do("do1", t =>
+                {
+                    ++invokeCount;
+                    return Status.Success;
+                })
+                .End()
+                .Build()
+                .Tick(data);
+
+            builder
+                .Selector("sel1")
+                .Do("do2", t =>
+                {
+                    ++invokeCount;
+                    return Status.Success;
+                })
+                .End()
+                .Build()
+                .Tick(data);
+
+            builder
+                .Parallel("para1", 0, 0)
+                .Do("do3", t =>
+                {
+                    ++invokeCount;
+                    return Status.Success;
+                })
+                .End()
+                .Build()
+                .Tick(data);
+
+            Assert.Equal(1, invokeCount);
         }
     }
 }

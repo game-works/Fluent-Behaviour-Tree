@@ -18,7 +18,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var callOrder = 0;
 
@@ -56,7 +56,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChild1 = new Mock<BehaviourTreeNode>();
             mockChild1
@@ -79,7 +79,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChild1 = new Mock<BehaviourTreeNode>();
             mockChild1
@@ -114,7 +114,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChild1 = new Mock<BehaviourTreeNode>();
             mockChild1
@@ -137,7 +137,7 @@ namespace tests
         {
             Init();
 
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var mockChild1 = new Mock<BehaviourTreeNode>();
             mockChild1

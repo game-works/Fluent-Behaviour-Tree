@@ -8,7 +8,7 @@ namespace tests
         [Fact]
         public void can_run_action()
         {
-            var time = new TimeData();
+            var time = new TimeData(0);
 
             var invokeCount = 0;
             var testObject = 
