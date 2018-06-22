@@ -1,4 +1,6 @@
-﻿namespace FluentBehaviourTree
+﻿using System.Linq;
+
+namespace FluentBehaviourTree
 {
     /// <summary>
     /// Represents time. Used to pass time values to behaviour tree nodes.
@@ -8,8 +10,8 @@
         public TimeData(float deltaTime)
         {
             DeltaTime = deltaTime;
-            RunningSequences = new int[10];
-            RunningSelectors = new int[10];
+            RunningSequences = Enumerable.Repeat(-1, 10).ToArray();
+            RunningSelectors = Enumerable.Repeat(-1, 10).ToArray();
         }
 
         public float DeltaTime { get; set; }

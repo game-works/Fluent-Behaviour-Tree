@@ -5,6 +5,8 @@
     /// </summary>
     public abstract class BehaviourTreeNode<T> where T : ITickData
     {
+        public bool IsCondition { get; set; }
+
         public bool IsDisabled { get; set; }
 
         /// <summary>

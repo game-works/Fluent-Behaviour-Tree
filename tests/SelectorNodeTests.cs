@@ -181,6 +181,60 @@ namespace tests
             mockChild2.Verify(m => m.Tick(time), Times.Once());
         }
 
+        [Fact]
+        public void continue_if_conditions_succeeds()
+        {
+            Init();
+
+            var time = new TimeData(0);
+
+            var mockChild1 = new Mock<BehaviourTreeNode>();
+            mockChild1.Object.IsCondition = true;
+            mockChild1
+                .Setup(m => m.Tick(time))
+                .Returns(Status.Success);
+
+            var mockChild2 = new Mock<BehaviourTreeNode>();
+            mockChild2
+                .Setup(m => m.Tick(time))
+                .Returns(Status.Success);
+
+            testObject.AddChild(mockChild1.Object);
+            testObject.AddChild(mockChild2.Object);
+
+            Assert.Equal(Status.Success, testObject.Tick(time));
+
+            mockChild1.Verify(m => m.Tick(time), Times.Once());
+            mockChild2.Verify(m => m.Tick(time), Times.Once());
+        }
+
+        [Fact]
+        public void fail_if_conditions_fail()
+        {
+            Init();
+
+            var time = new TimeData(0);
+
+            var mockChild1 = new Mock<BehaviourTreeNode>();
+            mockChild1.Object.IsCondition = true;
+            mockChild1
+                .Setup(m => m.Tick(time))
+                .Returns(Status.Failure);
+
+            var mockChild2 = new Mock<BehaviourTreeNode>();
+            mockChild2
+                .Setup(m => m.Tick(time))
+                .Returns(Status.Success);
+
+            testObject.AddChild(mockChild1.Object);
+            testObject.AddChild(mockChild2.Object);
+
+            Assert.Equal(Status.Failure, testObject.Tick(time));
+
+            mockChild1.Verify(m => m.Tick(time), Times.Once());
+            mockChild2.Verify(m => m.Tick(time), Times.Never);
+        }
+
     }
 }
 

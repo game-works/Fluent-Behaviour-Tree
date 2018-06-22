@@ -24,7 +24,15 @@
             {
                 var child = this[index];
                 var childStatus = child.Tick(data);
-             
+
+                if (child.IsCondition)
+                {
+                    if (childStatus == Status.Failure)
+                        return Status.Failure;
+                    
+                    continue;
+                }
+
                 if (childStatus == Status.Success)
                     return Status.Success;
 

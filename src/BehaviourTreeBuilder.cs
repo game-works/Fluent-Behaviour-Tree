@@ -37,7 +37,7 @@ namespace FluentBehaviourTree
         /// <summary>
         /// Create an action node.
         /// </summary>
-        public BehaviourTreeBuilder<T> Do(string name, Func<T, Status> fn)
+        public BehaviourTreeBuilder<T> Do(string name, Func<T, Status> fn, bool isCondition = false)
         {
             if (_parentNodeStack.Count <= 0)
             {
@@ -51,7 +51,8 @@ namespace FluentBehaviourTree
             int id = ++_idCounter;
             var actionNode = new ActionNode<T>(name, id, fn)
             {
-                IsDisabled = IsBlacklisted(id)
+                IsDisabled = IsBlacklisted(id),
+                IsCondition = isCondition
             };
 
             _parentNodeStack.Peek().AddChild(actionNode);
@@ -69,7 +70,7 @@ namespace FluentBehaviourTree
                 name = fn.Method.Name;
             }
 
-            return Do(name, t => fn(t) ? Status.Success : Status.Failure);
+            return Do(name, t => fn(t) ? Status.Success : Status.Failure, true);
         }
 
         /// <summary>
@@ -91,10 +92,10 @@ namespace FluentBehaviourTree
         /// <summary>
         /// Create a sequence node.
         /// </summary>
-        public BehaviourTreeBuilder<T> Sequence(string name)
+        public BehaviourTreeBuilder<T> Sequence(string name, bool skipConditionsIfRunning = true)
         {
             int id = ++_idCounter;
-            var sequenceNode = new SequenceNode<T>(name, id)
+            var sequenceNode = new SequenceNode<T>(name, id, skipConditionsIfRunning)
             {
                 SequenceId = _sequenceOccurenceCounter,
                 IsDisabled = IsBlacklisted(id)
