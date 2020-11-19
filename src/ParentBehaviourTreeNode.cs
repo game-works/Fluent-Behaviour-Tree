@@ -17,7 +17,7 @@ namespace FluentBehaviourTree
         /// </summary>
         public int ChildCount => _children.Count;
 
-        protected ParentBehaviourTreeNode(string name, int id) : base(name, id) { }
+        protected ParentBehaviourTreeNode(int id) : base(id) { }
 
         /// <summary>
         /// Retrieve a child node by index.

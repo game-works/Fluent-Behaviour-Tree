@@ -15,7 +15,7 @@
         /// </summary>
         private readonly int _numRequiredToSucceed;
 
-        public ParallelNode(string name, int id, int numRequiredToFail, int numRequiredToSucceed) : base(name, id)
+        public ParallelNode(int id, int numRequiredToFail, int numRequiredToSucceed) : base(id)
         {
             _numRequiredToFail = numRequiredToFail;
             _numRequiredToSucceed = numRequiredToSucceed;

@@ -22,9 +22,8 @@
         /// </summary>
         public bool HasExecuted { get; private set; }
 
-        protected BehaviourTreeNode(string name, int id)
+        protected BehaviourTreeNode(int id)
         {
-            Name = name;
             Id = id;
             LastExecutionStatus = Status.Failure;
         }

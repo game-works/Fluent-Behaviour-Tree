@@ -12,7 +12,7 @@ namespace FluentBehaviourTree
         /// </summary>
         private readonly Func<float, Status> _fn;
 
-        public FunctionNode(string name, int id, Func<float, Status> fn) : base(name, id)
+        public FunctionNode(int id, Func<float, Status> fn) : base(id)
         {
             _fn = fn;
         }

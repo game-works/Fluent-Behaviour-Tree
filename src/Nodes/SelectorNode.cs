@@ -7,7 +7,7 @@
     {
         private int _lastRunningChildIndex;
 
-        public SelectorNode(string name, int id) : base(name, id) { }
+        public SelectorNode(int id) : base(id) { }
 
         protected override Status AbstractTick(float dt)
         {

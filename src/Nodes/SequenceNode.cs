@@ -7,7 +7,7 @@
     {
         private int _lastRunningChildIndex;
 
-        public SequenceNode(string name, int id) : base(name, id)
+        public SequenceNode(int id) : base(id)
         {
         }
 
