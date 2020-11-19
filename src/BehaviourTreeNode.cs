@@ -3,12 +3,8 @@
     /// <summary>
     /// Interface for behaviour tree nodes.
     /// </summary>
-    public abstract class BehaviourTreeNode<T> where T : ITickData
+    public abstract class BehaviourTreeNode
     {
-        public bool IsCondition { get; set; }
-
-        public bool IsDisabled { get; set; }
-
         /// <summary>
         /// The reference name for this node
         /// </summary>
@@ -42,13 +38,10 @@
         /// <summary>
         /// Update the time of the behaviour tree.
         /// </summary>
-        public virtual Status Tick(T time)
+        public virtual Status Tick(float dt)
         {
-            if (IsDisabled)
-                return Status.Invalid;
-
             ResetLastExecStatus();
-            LastExecutionStatus = AbstractTick(time);
+            LastExecutionStatus = AbstractTick(dt);
             HasExecuted = true;
             return LastExecutionStatus;
         }
@@ -61,8 +54,6 @@
             HasExecuted = false;
         }
 
-        protected abstract Status AbstractTick(T data);
+        protected abstract Status AbstractTick(float dt);
     }
-
-    public abstract class BehaviourTreeNode : BehaviourTreeNode<TimeData> { }
 }

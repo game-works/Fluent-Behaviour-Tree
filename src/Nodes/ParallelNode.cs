@@ -3,7 +3,7 @@
     /// <summary>
     /// Runs childs nodes in parallel.
     /// </summary>
-    public class ParallelNode<T> : ParentBehaviourTreeNode<T> where T : ITickData
+    public class ParallelNode : ParentBehaviourTreeNode
     {
         /// <summary>
         /// Number of child failures required to terminate with failure.
@@ -21,7 +21,7 @@
             _numRequiredToSucceed = numRequiredToSucceed;
         }
 
-        protected override Status AbstractTick(T data)
+        protected override Status AbstractTick(float dt)
         {
             var numChildrenSuceeded = 0;
             var numChildrenFailed = 0;
@@ -29,7 +29,7 @@
             for (int i = 0; i < ChildCount; i++)
             {
                 var child = this[i];
-                var childStatus = child.Tick(data);
+                var childStatus = child.Tick(dt);
                 switch (childStatus)
                 {
                     case Status.Success: ++numChildrenSuceeded; break;
@@ -49,10 +49,5 @@
             
             return Status.Running;
         }
-    }
-
-    public class ParallelNode : ParallelNode<TimeData>
-    {
-        public ParallelNode(string name, int id, int numRequiredToFail, int numRequiredToSucceed) : base(name, id, numRequiredToFail, numRequiredToSucceed) { }
     }
 }

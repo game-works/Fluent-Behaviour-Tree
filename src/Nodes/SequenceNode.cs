@@ -3,69 +3,40 @@
     /// <summary>
     /// Runs child nodes in sequence, until one fails.
     /// </summary>
-    public class SequenceNode<T> : ParentBehaviourTreeNode<T> where T : ITickData
+    public class SequenceNode : ParentBehaviourTreeNode
     {
-        public bool SkipConditionsIfRunning { get; set; }
+        private int _lastRunningChildIndex;
 
-        public int SequenceId { get; set; }
-
-        public SequenceNode(string name, int id, bool skipConditionsIfRunning = true) : base(name, id)
+        public SequenceNode(string name, int id) : base(name, id)
         {
-            SkipConditionsIfRunning = skipConditionsIfRunning;
         }
 
-        protected override Status AbstractTick(T data)
+        protected override Status AbstractTick(float dt)
         {
-            int index = 0;
-
-            int runningNodeIndex = data.RunningSequences[SequenceId];
-            if (runningNodeIndex != -1)
-            {
-                if (SkipConditionsIfRunning)
-                    index = runningNodeIndex;
-
-                data.RunningSequences[SequenceId] = -1;
-            }
-
-            for (; index < ChildCount; index++)
+            for (var index = _lastRunningChildIndex; index < ChildCount; index++)
             {
                 var child = this[index];
 
-                //Checking if we should check conditions up before a running node.
-                bool checkCondtions = !SkipConditionsIfRunning &&
-                        runningNodeIndex != -1 &&
-                        index < runningNodeIndex;
+                var childStatus = child.Tick(dt);
 
-                //If we are, dont check non-condition nodes.
-                if (checkCondtions &&
-                    !child.IsCondition)
-                    continue;
-
-                var childStatus = child.Tick(data);
-
-                if (checkCondtions &&
-                    childStatus == Status.Success)
+                if (childStatus == Status.Success)
                     continue;
 
                 if (childStatus == Status.Failure)
+                {
+                    _lastRunningChildIndex = 0;
                     return childStatus;
+                }
 
                 if (childStatus == Status.Running)
                 {
-                    data.RunningSequences[SequenceId] = index;
+                    _lastRunningChildIndex = index;
                     return Status.Running;
                 }
             }
 
+            _lastRunningChildIndex = 0;
             return Status.Success;
-        }
-    }
-
-    public class SequenceNode : SequenceNode<TimeData>
-    {
-        public SequenceNode(string name, int id, bool skipConditionsIfRunning = true) : base(name, id)
-        {
-            SkipConditionsIfRunning = skipConditionsIfRunning;
         }
     }
 }

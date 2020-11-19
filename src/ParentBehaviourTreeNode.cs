@@ -5,12 +5,12 @@ namespace FluentBehaviourTree
     /// <summary>
     /// Interface for behaviour tree nodes.
     /// </summary>
-    public abstract class ParentBehaviourTreeNode<T> : BehaviourTreeNode<T> where T : ITickData
+    public abstract class ParentBehaviourTreeNode : BehaviourTreeNode
     {
         /// <summary>
         /// List of child nodes
         /// </summary>
-        private readonly List<BehaviourTreeNode<T>> _children = new List<BehaviourTreeNode<T>>();
+        private readonly List<BehaviourTreeNode> _children = new List<BehaviourTreeNode>();
 
         /// <summary>
         /// The number of children added to this node
@@ -22,7 +22,7 @@ namespace FluentBehaviourTree
         /// <summary>
         /// Retrieve a child node by index.
         /// </summary>
-        public BehaviourTreeNode<T> this[int index] => _children[index];
+        public BehaviourTreeNode this[int index] => _children[index];
 
         /// <summary>
         /// Marks that this node and all children have not execute yet.
@@ -38,7 +38,7 @@ namespace FluentBehaviourTree
         /// <summary>
         /// Add a child to the parent node.
         /// </summary>
-        public virtual void AddChild(BehaviourTreeNode<T> child)
+        public virtual void AddChild(BehaviourTreeNode child)
         {
             _children.Add(child);
         }

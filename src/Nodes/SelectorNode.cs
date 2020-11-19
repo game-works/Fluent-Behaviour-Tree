@@ -3,52 +3,34 @@
     /// <summary>
     /// Selects the first node that succeeds. Tries successive nodes until it finds one that doesn't fail.
     /// </summary>
-    public class SelectorNode<T> : ParentBehaviourTreeNode<T> where T : ITickData
+    public class SelectorNode : ParentBehaviourTreeNode
     {
-        public int SelectorId { get; set; }
+        private int _lastRunningChildIndex;
 
         public SelectorNode(string name, int id) : base(name, id) { }
 
-        protected override Status AbstractTick(T data)
+        protected override Status AbstractTick(float dt)
         {
-            int index = 0;
-
-            int runningNodeIndex = data.RunningSelectors[SelectorId];
-            if (runningNodeIndex != -1)
-            {
-                index = runningNodeIndex;
-                data.RunningSelectors[SelectorId] = -1;
-            }
-
-            for (; index < ChildCount; index++)
+            for (var index = _lastRunningChildIndex ; index < ChildCount; index++)
             {
                 var child = this[index];
-                var childStatus = child.Tick(data);
-
-                if (child.IsCondition)
-                {
-                    if (childStatus == Status.Failure)
-                        return Status.Failure;
-                    
-                    continue;
-                }
+                var childStatus = child.Tick(dt);
 
                 if (childStatus == Status.Success)
+                {
+                    _lastRunningChildIndex = 0;
                     return Status.Success;
+                }
 
                 if (childStatus == Status.Running)
                 {
-                    data.RunningSelectors[SelectorId] = index;
+                    _lastRunningChildIndex = index;
                     return Status.Running;
                 }
             }
 
+            _lastRunningChildIndex = 0;
             return Status.Failure;
         }
-    }
-
-    public class SelectorNode : SelectorNode<TimeData>
-    {
-        public SelectorNode(string name, int id) : base(name, id) { }
     }
 }
