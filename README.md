@@ -1,4 +1,4 @@
-# Fluent-Behaviour-Tree
+# Fluent-Behaviour-Tree (Modified for Unity)
 
 C# behaviour tree library with a fluent API.
 
