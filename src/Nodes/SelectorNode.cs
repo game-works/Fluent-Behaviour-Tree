@@ -1,50 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FluentBehaviourTree
+﻿namespace FluentBehaviourTree
 {
     /// <summary>
     /// Selects the first node that succeeds. Tries successive nodes until it finds one that doesn't fail.
     /// </summary>
-    public class SelectorNode : IParentBehaviourTreeNode
+    public class SelectorNode : ParentBehaviourTreeNode
     {
-        /// <summary>
-        /// The name of the node.
-        /// </summary>
-        private string name;
+        private int _lastRunningChildIndex;
 
-        /// <summary>
-        /// List of child nodes.
-        /// </summary>
-        private List<IBehaviourTreeNode> children = new List<IBehaviourTreeNode>(); //todo: optimization, bake this to an array.
+        public SelectorNode(int id) : base(id) { }
 
-        public SelectorNode(string name)
+        protected override Status AbstractTick(float dt)
         {
-            this.name = name;
-        }
-
-        public BehaviourTreeStatus Tick(TimeData time)
-        {
-            foreach (var child in children)
+            for (var index = _lastRunningChildIndex ; index < ChildCount; index++)
             {
-                var childStatus = child.Tick(time);
-                if (childStatus != BehaviourTreeStatus.Failure)
+                var child = this[index];
+                var childStatus = child.Tick(dt);
+
+                if (childStatus == Status.Success)
                 {
-                    return childStatus;
+                    _lastRunningChildIndex = 0;
+                    return Status.Success;
+                }
+
+                if (childStatus == Status.Running)
+                {
+                    _lastRunningChildIndex = index;
+                    return Status.Running;
                 }
             }
 
-            return BehaviourTreeStatus.Failure;
-        }
-
-        /// <summary>
-        /// Add a child node to the selector.
-        /// </summary>
-        public void AddChild(IBehaviourTreeNode child)
-        {
-            children.Add(child);
+            _lastRunningChildIndex = 0;
+            return Status.Failure;
         }
     }
 }

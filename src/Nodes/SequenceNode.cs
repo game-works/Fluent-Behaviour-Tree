@@ -1,50 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FluentBehaviourTree
+﻿namespace FluentBehaviourTree
 {
     /// <summary>
     /// Runs child nodes in sequence, until one fails.
     /// </summary>
-    public class SequenceNode : IParentBehaviourTreeNode
+    public class SequenceNode : ParentBehaviourTreeNode
     {
-        /// <summary>
-        /// Name of the node.
-        /// </summary>
-        private string name;
+        private int _lastRunningChildIndex;
 
-        /// <summary>
-        /// List of child nodes.
-        /// </summary>
-        private List<IBehaviourTreeNode> children = new List<IBehaviourTreeNode>(); //todo: this could be optimized as a baked array.
-
-        public SequenceNode(string name)
+        public SequenceNode(int id) : base(id)
         {
-            this.name = name;
         }
 
-        public BehaviourTreeStatus Tick(TimeData time)
+        protected override Status AbstractTick(float dt)
         {
-            foreach (var child in children)
+            for (var index = _lastRunningChildIndex; index < ChildCount; index++)
             {
-                var childStatus = child.Tick(time);
-                if (childStatus != BehaviourTreeStatus.Success)
+                var child = this[index];
+
+                var childStatus = child.Tick(dt);
+
+                if (childStatus == Status.Success)
+                    continue;
+
+                if (childStatus == Status.Failure)
                 {
+                    _lastRunningChildIndex = 0;
                     return childStatus;
+                }
+
+                if (childStatus == Status.Running)
+                {
+                    _lastRunningChildIndex = index;
+                    return Status.Running;
                 }
             }
 
-            return BehaviourTreeStatus.Success;
-        }
-
-        /// <summary>
-        /// Add a child to the sequence.
-        /// </summary>
-        public void AddChild(IBehaviourTreeNode child)
-        {
-            children.Add(child);
+            _lastRunningChildIndex = 0;
+            return Status.Success;
         }
     }
 }

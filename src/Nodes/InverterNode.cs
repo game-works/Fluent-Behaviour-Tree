@@ -1,63 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace FluentBehaviourTree
 {
     /// <summary>
     /// Decorator node that inverts the success/failure of its child.
     /// </summary>
-    public class InverterNode : IParentBehaviourTreeNode
+    public class InverterNode : ParentBehaviourTreeNode
     {
-        /// <summary>
-        /// Name of the node.
-        /// </summary>
-        private string name;
-
         /// <summary>
         /// The child to be inverted.
         /// </summary>
-        private IBehaviourTreeNode childNode;
+        private BehaviourTreeNode ChildNode => ChildCount == 0 ? null : this[0];
 
-        public InverterNode(string name)
-        {
-            this.name = name;
-        }
+        public InverterNode(int id) : base(id) { }
 
-        public BehaviourTreeStatus Tick(TimeData time)
+        protected override Status AbstractTick(float data)
         {
-            if (childNode == null)
-            {
+            if (ChildNode == null)
                 throw new ApplicationException("InverterNode must have a child node!");
-            }
 
-            var result = childNode.Tick(time);
-            if (result == BehaviourTreeStatus.Failure)
+            var result = ChildNode.Tick(data);
+
+            switch (result)
             {
-                return BehaviourTreeStatus.Success;
-            }
-            else if (result == BehaviourTreeStatus.Success)
-            {
-                return BehaviourTreeStatus.Failure;
-            }
-            else
-            {
-                return result;
+                case Status.Failure:
+                    return Status.Success;
+                case Status.Success:
+                    return Status.Failure;
+                default:
+                    return result;
             }
         }
 
-        /// <summary>
-        /// Add a child to the parent node.
-        /// </summary>
-        public void AddChild(IBehaviourTreeNode child)
+        public override void AddChild(BehaviourTreeNode child)
         {
-            if (this.childNode != null)
-            {
+            if (ChildNode != null)
                 throw new ApplicationException("Can't add more than a single child to InverterNode!");
-            }
-
-            this.childNode = child;
+            
+            base.AddChild(child);
         }
     }
 }

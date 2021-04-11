@@ -1,73 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FluentBehaviourTree
+﻿namespace FluentBehaviourTree
 {
     /// <summary>
     /// Runs childs nodes in parallel.
     /// </summary>
-    public class ParallelNode : IParentBehaviourTreeNode
+    public class ParallelNode : ParentBehaviourTreeNode
     {
-        /// <summary>
-        /// Name of the node.
-        /// </summary>
-        private string name;
-
-        /// <summary>
-        /// List of child nodes.
-        /// </summary>
-        private List<IBehaviourTreeNode> children = new List<IBehaviourTreeNode>();
-
         /// <summary>
         /// Number of child failures required to terminate with failure.
         /// </summary>
-        private int numRequiredToFail;
+        private readonly int _numRequiredToFail;
 
         /// <summary>
         /// Number of child successess require to terminate with success.
         /// </summary>
-        private int numRequiredToSucceed;
+        private readonly int _numRequiredToSucceed;
 
-        public ParallelNode(string name, int numRequiredToFail, int numRequiredToSucceed)
+        public ParallelNode(int id, int numRequiredToFail, int numRequiredToSucceed) : base(id)
         {
-            this.name = name;
-            this.numRequiredToFail = numRequiredToFail;
-            this.numRequiredToSucceed = numRequiredToSucceed;
+            _numRequiredToFail = numRequiredToFail;
+            _numRequiredToSucceed = numRequiredToSucceed;
         }
 
-        public BehaviourTreeStatus Tick(TimeData time)
+        protected override Status AbstractTick(float dt)
         {
             var numChildrenSuceeded = 0;
             var numChildrenFailed = 0;
 
-            foreach (var child in children)
+            for (int i = 0; i < ChildCount; i++)
             {
-                var childStatus = child.Tick(time);
+                var child = this[i];
+                var childStatus = child.Tick(dt);
                 switch (childStatus)
                 {
-                    case BehaviourTreeStatus.Success: ++numChildrenSuceeded; break;
-                    case BehaviourTreeStatus.Failure: ++numChildrenFailed; break;
+                    case Status.Success: ++numChildrenSuceeded; break;
+                    case Status.Failure: ++numChildrenFailed; break;
                 }
             }
-
-            if (numRequiredToSucceed > 0 && numChildrenSuceeded >= numRequiredToSucceed)
+            
+            if (_numRequiredToSucceed > 0 && numChildrenSuceeded >= _numRequiredToSucceed)
             {
-                return BehaviourTreeStatus.Success;
+                return Status.Success;
             }
-
-            if (numRequiredToFail > 0 && numChildrenFailed >= numRequiredToFail)
+            
+            if (_numRequiredToFail > 0 && numChildrenFailed >= _numRequiredToFail)
             {
-                return BehaviourTreeStatus.Failure;
+                return Status.Failure;
             }
-
-            return BehaviourTreeStatus.Running;
-        }
-
-        public void AddChild(IBehaviourTreeNode child)
-        {
-            children.Add(child);
+            
+            return Status.Running;
         }
     }
 }
